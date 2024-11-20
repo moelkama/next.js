@@ -1,12 +1,12 @@
 import React from 'react';
 
 export const dynamic = 'force-static'; // Ensures static generation (optional, defaults to static)
-export const revalidate = 60; // Revalidate the page every 60 seconds
+export const revalidate = 20; // Revalidate the page every 60 seconds
 
 async function getData() {
   const id = Math.floor(Math.random() * 100);
   const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-    next: { revalidate: 60 },
+    next: { revalidate: 20 },
   });
 
   if (!res.ok) {
