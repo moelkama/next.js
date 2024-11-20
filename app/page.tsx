@@ -1,6 +1,8 @@
 
 export default function Home() {
+  const n : number = Math.floor(Math.random() * 500);
+  console.log(n);
   return (
-    <h1>hello world!</h1>
+    <h1>{n}</h1>
   );
 }
