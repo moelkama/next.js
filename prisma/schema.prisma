@@ -1,0 +1,22 @@
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb+srv://elkamalmohammed234:1QbuACMi2mitfDRq@cluster0.ldqwo.mongodb.net/sample_mflix?retryWrites=true&w=majority&appName=Cluster0"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  email   String   @unique
+  name    String
+}
+
+model Post {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  title   String
+  body    String
+}
+// moh
+// XdYveZup1ziV0YKG
