@@ -13,10 +13,10 @@ model User {
   username    String  @unique
   first_name    String
   last_name    String
-  password    String
-  created_at  DateTime @default(now())
   profile     String?
 }
+
+//  created_at  DateTime @default(now())
 
 // moh
 // XdYveZup1ziV0YKG

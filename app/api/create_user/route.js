@@ -1,12 +1,14 @@
 import { PrismaClient, Prisma } from '@prisma/client';
-// import multer from 'multer';
 import {  NextResponse } from 'next/server';
-import path from 'path';
-import formidable from 'formidable';
-// const prisma = new PrismaClient();
-// const upload = multer({dest: path.join(process.cwd(), 'public/uploads'), });
+import { existsSync } from "fs";
+import fs from "fs/promises";
+import path from "path";
+import { v4 as uuidv4 } from 'uuid';
+import { profile } from 'console';
 
-// import { v4 as uuidv4 } from 'uuid';
+const UPLOAD_PATH = "public/upload";
+
+const prisma = new PrismaClient();
 
 export const config = {
     api: {
@@ -14,60 +16,67 @@ export const config = {
     },
 };
 
-export async function POST(req, res) {
-    const form = new formidable.IncomingForm(
-        {
-            uploadDir: path.join(process.cwd(), 'public/uploads'), // Define the upload directory
-            keepExtensions: true, // Keep the file extensions (e.g., .jpg, .png)
-        }
+async function saveFile(file, destinationDirPath, file_name) {
+    const fileArrayBuffer = await file.arrayBuffer();
+
+    if (!existsSync(destinationDirPath))
+        fs.mkdir(destinationDirPath, { recursive: true });
+
+    await fs.writeFile(
+        path.join(destinationDirPath, file_name),
+        Buffer.from(fileArrayBuffer),
+        'utf8'
     );
-    form.uploadDir = "./public/uploads";  // Specify the folder to save the image
-    form.keepExtensions = true;  // Keep the file extensions (e.g., .jpg, .png)
-    form.maxFieldsSize = 10 * 1024 * 1024;  // Maximum file size (10MB)
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        console.error(err);
-        return NextResponse.json({ 'message': 'errrrr' });
+    return ({ status: 201 });
+}
+
+export async function POST(req, res) {
+    const formData = await req.formData();
+    // const file = formData.get("file");
+    // if (!file)
+    //     return NextResponse.json({ status: 400 });
+    // const uniqueId = uuidv4();
+    // const extension  = path.extname(file.name);
+    const destinationDirPath = path.join(process.cwd(), UPLOAD_PATH);
+    // const avatar_name = `${uniqueId}${extension}`;
+
+    const first_name = formData.get('first_name');
+    const last_name = formData.get('last_name');
+    const username = formData.get('username');
+    const email = formData.get('email');
+    // const password = formData.get('password');
+    try
+    {
+        // await saveFile(file, destinationDirPath, avatar_name);
+        console.log("hello world?????????");
+        await prisma.user.create(
+            { data:{
+                email,
+                username,
+                first_name,
+                last_name,
+                hello: 'hello_world',
+            }});
     }
-    
-    const file = files.image[0];  // Assuming you're sending 'image' field from form
-    const filePath = `/uploads/${file.newFilename}`;
-    
-    Console.log("--------->", file, filePath);
-    return NextResponse.json({ 'message': 'success' });
-    });
-    // const fileName = `${uuidv4()}_${'file'}`;
-    // const filePath = `./public/uploads/${fileName}`;
+    catch (error)
+    {
+        console.log("errrrrrrrrrrrrror:", error);
+        if (error instanceof Prisma.PrismaClientKnownRequestError)
+        {
+            if (error.code === 'P2002')
+            {
+                const duplicatedField = error.meta.target;
 
-    // const { first_name, last_name, username, email } = await request.json();
-    // try
-    // {
-    //     await prisma.tst.create(
-    //         { data:{
-    //             first_name,
-    //             last_name,
-    //             username,
-    //             email,
-    //         }});
-    // }
-    // catch (error)
-    // {
-    //     if (error instanceof Prisma.PrismaClientKnownRequestError)
-    //     {
-    //         if (error.code === 'P2002')
-    //         {
-    //             const duplicatedField = error.meta.target;
-
-    //             if (duplicatedField.includes('email')) 
-    //                 return NextResponse.json({ 'error': 'A user with this email already exists' }, { status: 400 });
-    //             else if (duplicatedField.includes('username'))
-    //                 return NextResponse.json({ 'error': 'A user with this username already exists' }, { status: 400 });
-    //             else
-    //                 return NextResponse.json({ 'error': 'A unique constraint violation occurred' }, { status: 400 });
-    //         }
-    //         else
-    //             console.error('Prisma error code:', error.code, error.message);
-    //     }
-    // }
+                if (duplicatedField.includes('email')) 
+                    return NextResponse.json({ 'error': 'A user with this email already exists' }, { status: 400 });
+                else if (duplicatedField.includes('username'))
+                    return NextResponse.json({ 'error': 'A user with this username already exists' }, { status: 400 });
+                else
+                    return NextResponse.json({ 'error': 'A unique constraint violation occurred' }, { status: 400 });
+            }
+            else
+                return NextResponse.json({ 'error': 'Somthing went wrong please try again...' }, { status: 500 });
+        }
+    }
     return NextResponse.json({ 'message': 'User created successfully' });
 }
