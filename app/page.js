@@ -42,6 +42,6 @@ export default async function handler() {
     // const users = await prisma.user.findMany();
     // console.log(users);
   // } else if (req.method === 'POST') {
-  //   
-  return (<h1>hello world!</h1>)
+  //
+  return (<h1 className="bg-yellow-500">hello world!</h1>)
 }

@@ -10,13 +10,13 @@ generator client {
 model User {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
   email   String   @unique
-  name    String
+  username    String  @unique
+  first_name    String
+  last_name    String
+  password    String
+  created_at  DateTime @default(now())
+  profile     String?
 }
 
-model Post {
-  id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  title   String
-  body    String
-}
 // moh
 // XdYveZup1ziV0YKG
