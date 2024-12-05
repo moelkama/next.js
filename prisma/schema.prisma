@@ -13,7 +13,7 @@ model User {
   username    String  @unique
   first_name    String
   last_name    String
-  profile     String?
+  profile     String
 }
 
 //  created_at  DateTime @default(now())

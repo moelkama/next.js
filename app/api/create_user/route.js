@@ -4,9 +4,9 @@ import { existsSync } from "fs";
 import fs from "fs/promises";
 import path from "path";
 import { v4 as uuidv4 } from 'uuid';
-import { profile } from 'console';
 
-const UPLOAD_PATH = "public/upload";
+const UPLOAD_DIR = "upload/";
+const UPLOAD_PATH = `/public/${UPLOAD_DIR}`;
 
 const prisma = new PrismaClient();
 
@@ -32,13 +32,13 @@ async function saveFile(file, destinationDirPath, file_name) {
 
 export async function POST(req, res) {
     const formData = await req.formData();
-    // const file = formData.get("file");
-    // if (!file)
-    //     return NextResponse.json({ status: 400 });
-    // const uniqueId = uuidv4();
-    // const extension  = path.extname(file.name);
+    const file = formData.get("file");
+    if (!file)
+        return NextResponse.json({ status: 400 });
+    const uniqueId = uuidv4();
+    const extension  = path.extname(file.name);
     const destinationDirPath = path.join(process.cwd(), UPLOAD_PATH);
-    // const avatar_name = `${uniqueId}${extension}`;
+    const avatar_name = `${uniqueId}${extension}`;
 
     const first_name = formData.get('first_name');
     const last_name = formData.get('last_name');
@@ -47,20 +47,19 @@ export async function POST(req, res) {
     // const password = formData.get('password');
     try
     {
-        // await saveFile(file, destinationDirPath, avatar_name);
-        console.log("hello world?????????");
         await prisma.user.create(
             { data:{
                 email,
                 username,
                 first_name,
                 last_name,
-                hello: 'hello_world',
+                'profile': UPLOAD_DIR + '/' + avatar_name,
             }});
+        await saveFile(file, destinationDirPath, avatar_name);
     }
     catch (error)
     {
-        console.log("errrrrrrrrrrrrror:", error);
+        console.log("errrrrrrrrrrrrror:");
         if (error instanceof Prisma.PrismaClientKnownRequestError)
         {
             if (error.code === 'P2002')

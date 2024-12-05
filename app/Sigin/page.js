@@ -51,10 +51,10 @@ const Create_User_Url = '/api/create_user';
 export default function CreateUser() {
     const [formData, setFormData] = useState(
     {
-        first_name: 'Mohamed',
-        last_name: 'Elkamal',
-        username: 'moelkama',
-        email: 'mohame@gmail.com',
+        first_name: `Mohamed`,
+        last_name: `Elkamal`,
+        username: `moelkama${Math.floor(Math.random() * 100000)}${Math.floor(Math.random() * 100000)}`,
+        email: `mohame${Math.floor(Math.random() * 100000)}${Math.floor(Math.random() * 100000)}@gmail.com`,
         password: 'User1234',
         cpassword: 'User1234',
     });
@@ -73,57 +73,50 @@ export default function CreateUser() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // if (!file) {
-        //     alert('Please select a file first!');
-        //     return;
-        //   }
-        try {    
+        if (!file)
+        {
+            setMessage('Please select a file first!');
+            return;
+        }
+        try
+        {
             const input_data = new FormData();
-            // input_data.append('file', file);
+            input_data.append('file', file);
             input_data.append('first_name', formData.first_name);
             input_data.append('last_name', formData.last_name);
             input_data.append('username', formData.username);
             input_data.append('email', formData.email);
             input_data.append('password', formData.password);
 
-            try {
-                const response = await fetch(Create_User_Url, {
-                    method: 'POST',
-                    body: input_data
-                });
-            
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('File uploaded successfully:', result);
-                    alert('File uploaded successfully!');
-                } else {
-                    console.error('Upload failed:', response.statusText);
-                    alert('Upload failed.');
-                }
-                } catch (error) {
-                console.error('Error during upload:', error);
-                alert('Error during upload.');
-                }
-                if (response.ok) {
-                    setMessage(data.message); // Show success message
-                    setFormData({ 
-                    first_name: '',
-                    last_name: '',
-                    username: '',
-                    email: '',
-                    username: '',
-                    password: '',
-                    cpassword: '',
-                    }); // Clear the form
-            } else {
-                console.error(data);
-                setMessage(data.error || 'Submission failed');
+            const response = await fetch(Create_User_Url, {
+                method: 'POST',
+                body: input_data
+            });
+        
+            const result = await response.json();
+            console.log('::::::::::::',result);
+            if (response.ok)
+            {
+                setMessage('user created successfully!');
+                // setFormData({ 
+                // first_name: '',
+                // last_name: '',
+                // username: '',
+                // email: '',
+                // username: '',
+                // password: '',
+                // cpassword: '',});
+                setFile(file);
             }
-        } catch (error) {
-          setMessage(error);
+            else
+                setMessage(`create user failed: ${result.error}`);
         }
-      };
-;
+        catch (error)
+        {
+            console.error('catch errorrrrrrrrr:');
+            setMessage('catch error:', error);
+        }
+    }
     
     return (
         <form onSubmit={handleSubmit}>
@@ -151,7 +144,7 @@ export default function CreateUser() {
                 <label name="email">Confirme password:</label>
                 <input value={formData.cpassword} onChange={handleChange} type="text" name="Cpassword" required />
             </div>
-            {/* <input type="file" onChange={handleFileChange} required /> */}
+            <input type="file" onChange={handleFileChange} required />
             <h1 className="">{message}</h1>
             <button type="submit">Submit</button>
         </form>
